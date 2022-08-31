@@ -1,0 +1,15 @@
+<launch>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find catch_trash)/launch/log.conf"/>
+
+    <node name="mapserver" type="map_server" pkg="map_server" args="$(env HOME)/.robot/data/maps/lvisam/lvisam.yaml"/>
+
+    <node name="astar" pkg="catch_trash" type="jtrob_nav_astar_node" output="screen"/>
+
+    <node name="localPerception" pkg="catch_trash" type="localPerception" output="screen"/>
+    
+    <node name="globalPlanner" pkg="catch_trash" type="globalPlaner.py" output="screen"/>
+
+    <node name="gen_model" pkg="catch_trash" type="gen_model.py" output="screen"/>
+
+</launch>

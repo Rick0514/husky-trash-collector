@@ -1,0 +1,24 @@
+<launch>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find catch_trash)/launch/log.conf"/>
+    <env name="GAZEBO_MODEL_PATH" value="/home/hgy/9tian_ws/src/minimal-9tian-simulation/robot_gazebo/models"/>
+    <env name="GAZEBO_RESOURCE_PATH" value="/home/hgy/9tian_ws/src/minimal-9tian-simulation/robot_gazebo/models"/>
+
+    <!-- <node name="mapserver" type="map_server" pkg="map_server" args="$(env HOME)/.robot/data/maps/lvisam/lvisam.yaml"/> -->
+
+    <!-- <node name="astar" pkg="catch_trash" type="jtrob_nav_astar_node" output="screen"/> -->
+    
+    <!-- <node name="test" pkg="catch_trash" type="gen_model.py" output="screen"/> -->
+
+    <arg name="world_name" value="exp" />
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find husky_description)/worlds/$(arg world_name)" />
+        <arg name="paused" value="false" />
+        <arg name="use_sim_time" value="true" />
+        <arg name="gui" value="true" />
+        <arg name="headless" value="false" />
+        <arg name="debug" value="false" />
+        <arg name="verbose" value="false" />
+    </include>
+
+</launch>

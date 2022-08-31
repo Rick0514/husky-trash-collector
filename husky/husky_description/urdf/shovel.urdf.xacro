@@ -1,0 +1,133 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="shovel">
+
+	<xacro:macro name="shovel" params="parent *joint_pose">
+
+    <joint name="baselink_to_shovel" type="fixed">
+        <parent link="${parent}"/>
+        <child link="Shovel__link_0_clone_clone"/>
+        <xacro:insert_block name="joint_pose"/>
+        <axis xyz="0 1 0" rpy="0 0 0" />
+    </joint>
+
+  <joint name="Shovel__link_0_clone_clone_JOINT_0" type="fixed">
+    <parent link="Shovel__link_0_clone_clone"/>
+    <child link="Shovel__link_0_clone"/>
+    <origin xyz="0.03333 -0.2      0" rpy="0 0 0"/>
+    <axis xyz="0 0 0"/>
+    <limit lower="0" upper="0" effort="0" velocity="0"/>
+  </joint>
+  <joint name="Shovel__link_0_clone_clone_JOINT_1" type="fixed">
+    <parent link="Shovel__link_0_clone_clone"/>
+    <child link="Shovel__link_0_clone_clone_0"/>
+    <origin xyz="0.03333 0.2     0" rpy="0 0 0"/>
+    <axis xyz="0 0 0"/>
+    <limit lower="0" upper="0" effort="0" velocity="0"/>
+  </joint>
+  <link name="Shovel__link_0_clone">
+    <inertial>
+      <mass value="0.116625"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.00312424" ixy="0" ixz="0" iyy="0.0123555" iyz="0" izz="0.0102061"/>
+    </inertial>
+    <collision name="Shovel__collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3 0.1 0.1"/>
+      </geometry>
+    </collision>
+    <visual name="Shovel__visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3 0.1 0.1"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="Shovel__link_0_clone_clone">
+    <inertial>
+      <mass value="0.116625"/>
+      <origin xyz="0 0 0" rpy="0    0    0.707"/>
+      <inertia ixx="0.00312424" ixy="0" ixz="0" iyy="0.0123555" iyz="0" izz="0.0102061"/>
+    </inertial>
+    <collision name="Shovel__collision">
+      <origin xyz="-0.06666  0       0" rpy="0     0     1.5708"/>
+      <geometry>
+        <box size="0.3 0.1 0.1"/>
+      </geometry>
+    </collision>
+    <visual name="Shovel__visual">
+      <origin xyz="-0.06666  0       0" rpy="0     0     1.5708"/>
+      <geometry>
+        <box size="0.3 0.1 0.1"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="Shovel__link_0_clone_clone_0">
+    <inertial>
+      <mass value="0.116625"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.00312424" ixy="0" ixz="0" iyy="0.0123555" iyz="0" izz="0.0102061"/>
+    </inertial>
+    <collision name="Shovel__collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3 0.1 0.1"/>
+      </geometry>
+    </collision>
+    <visual name="Shovel__visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3 0.1 0.1"/>
+      </geometry>
+    </visual>
+    </link>
+
+    <link name="door">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <inertia ixx="0.00312424" ixy="0" ixz="0" iyy="0.0123555" iyz="0" izz="0.0102061"/>
+    </inertial>
+    <collision name="door_collision">
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.4"/>
+      </geometry>
+    </collision>
+    <visual name="door_visual">
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.4"/>
+      </geometry>
+    </visual>
+  </link>
+
+    <joint name="right_to_door" type="continuous">
+        <parent link="Shovel__link_0_clone"/>
+        <child link="door"/>
+        <origin xyz="0.18 0 0" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-1.571" upper="0.707" effort="20" velocity="0"/>
+        <!-- <dynamics damping="1.0"/> -->
+    </joint>
+
+      <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="right_to_door">
+       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+    <gazebo>
+    <plugin name="gazebo_ros_control_1" filename="libgazebo_ros_control.so">
+      <robotNamespace>/rrbot</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+
+  	</xacro:macro>
+</robot>

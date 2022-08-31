@@ -1,0 +1,10 @@
+nav_msgs/Path first_path
+nav_msgs/Path second_path
+string map_name
+string first_path_name
+string second_path_name
+---
+int8 status
+string message
+string path_name
+nav_msgs/Path planner_path

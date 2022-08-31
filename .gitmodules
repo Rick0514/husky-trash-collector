@@ -1,0 +1,6 @@
+[submodule "third_parties/hdl_localization"]
+	path = third_parties/hdl_localization
+	url = https://github.com/koide3/hdl_localization
+[submodule "third_parties/LVI-SAM"]
+	path = third_parties/LVI-SAM
+	url = https://github.com/TixiaoShan/LVI-SAM

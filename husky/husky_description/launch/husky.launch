@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- !!!!!! params to specify !!!!!! -->
+
+  <arg name="use_rviz" default="true" />
+  <arg name="use_gazebo_gui" default="true" />
+  <arg name="world_name" value="exp" />
+  <arg name="record_bag" value="false" />
+  <arg name="follow_vp" default="false" />
+  
+  <!-- !!!!!! params to specify !!!!!! -->
+
+  <env name="GAZEBO_MODEL_PATH" value="/home/hgy/9tian_ws/src/minimal-9tian-simulation/robot_gazebo/models"/>
+  <env name="GAZEBO_RESOURCE_PATH" value="/home/hgy/9tian_ws/src/minimal-9tian-simulation/robot_gazebo/models"/>
+
+  <arg name="robot_namespace" default="/"/>
+  <param name="robot_description" command="$(find xacro)/xacro '$(find husky_description)/urdf/husky.urdf.xacro' robot_namespace:=$(arg robot_namespace)" />
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+            <!-- <param name="tf_prefix" value="$(arg multi_robot_name)"/> -->
+  </node>
+
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+        <!-- <param name="use_gui" value="true"/> -->
+    <param name="rate" value="50"/>
+  </node>
+
+  <rosparam command="load" file="$(find husky_control)/config/control.yaml" />
+  <!-- Spawn controllers -->
+  <node name="base_controller_spawner" pkg="controller_manager" type="spawner"
+        args="husky_joint_publisher husky_velocity_controller"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find husky_description)/rviz/husky.rviz" if="$(arg use_rviz)" />
+
+  <!-- <node name="keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" launch-prefix="gnome-terminal -x" /> -->
+  <node name="keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" args="cmd_vel:=/husky_velocity_controller/cmd_vel" launch-prefix="gnome-terminal -x" unless="$(arg follow_vp)"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(find husky_description)/worlds/$(arg world_name)" />
+      <arg name="paused" value="false" />
+      <arg name="use_sim_time" value="true" />
+      <arg name="gui" value="$(arg use_gazebo_gui)" />
+      <arg name="headless" value="false" />
+      <arg name="debug" value="false" />
+      <arg name="verbose" value="false" />
+  </include>
+    <!-- 在 gazebo 中显示机器人模型 -->
+  <node pkg="gazebo_ros" type="spawn_model" name="model" args="-urdf -model robot -param robot_description" />
+
+  <node name="p3d_baselink" pkg="husky_utility" type="fromP3dToTF" args="baselink" >
+      <param name="parent_frame" value="world"/>
+      <param name="child_frame" value="base_link"/>
+      <param name="topic" value="odom_baselink"/>
+  </node>
+
+  <node name="p3d_baselink_encoder" pkg="husky_utility" type="fromP3dToTF" args="baselink_encoder" >
+      <param name="parent_frame" value="world"/>
+      <param name="child_frame" value="baselink_encoder"/>
+      <param name="topic" value="husky_velocity_controller/odom"/>
+  </node>
+
+  <node name="followViaPoints" pkg="husky_utility" type="followViaPoints" output="screen" if="$(arg follow_vp)">
+      <param name="set_or_read" value="false"/>
+      <param name="odom_topic" value="/odom_baselink"/>
+      <param name="points_filedir" value="$(find husky_description)/config/vp-exp.txt"/>
+      <param name="send_cmd" value="/husky_velocity_controller/cmd_vel"/>
+      <param name="ang_mul" value="1.0"/>
+  </node>
+
+  <node name="robot_state_publisher_door" pkg="robot_state_publisher" type="robot_state_publisher"
+	respawn="false" output="screen">
+    <remap from="/joint_states" to="/rrbot/joint_states" />
+  </node>
+
+
+<node name="controller_spawner_1" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/rrbot" args="joint1_position_controller joint_state_controller"/>
+
+  <node name="record_bag" pkg="rosbag" type="record" args="-O $(find husky_description)/bag/$(arg world_name).bag /lidar_points /imu/data /husky_velocity_controller/odom /odom_baselink /camera/camera_info /camera/image_raw" if="$(arg record_bag)"/>
+
+</launch>

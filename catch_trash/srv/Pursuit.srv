@@ -1,0 +1,14 @@
+int16  task_index        #REQUIRED
+int8   command           #REQUIRED
+string mode              #REQUIRED
+
+string map               #optional
+string path_name         #optional
+
+nav_msgs/Path path       #optional
+
+float64  rotation_angle  #optional
+
+---
+int8 status
+string message
